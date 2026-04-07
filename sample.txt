@@ -19,4 +19,8 @@ git status
 
 git checkout -b
 
+this is stach command checking
+stash pop
+stash apply
+stash list
 

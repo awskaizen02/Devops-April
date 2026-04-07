@@ -10,3 +10,7 @@ this is 3rd commit
 
 
 this line added in todays session
+
+this line added to check the stash command
+
+this line add to check the squash command

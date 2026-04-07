@@ -7,3 +7,13 @@ git commit -m
 git branch
 git merge
 git rebase
+
+
+git checkout
+git cherry-pick
+git push
+
+git log
+git log --oneline
+git status
+

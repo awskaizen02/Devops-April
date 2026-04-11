@@ -111,6 +111,24 @@ git push origin main
 ```
 git pull origin main
 ```
+===============
+git conflicts
+===============
+
+git pull : to bring latest code changes from central repo to local repo
+
+=======================
+git pull vs git fetch
+=======================
+
+git pull: Download changes from central repo to local repo and merge changes in working tree.
+
+git fetch : download changes from central repo to local repo.
+
+Note: To merge changes from local repo to working tree we need to use 'git merge' command
+
+		git pull = git fetch + git merge
+
 # Branch Commands  // Create branch
 ```
 git branch feature1
@@ -128,6 +146,15 @@ git switch feature1
 # Merge Branch  // Merges feature1 into current branch
 ```
 git merge feature1
+
+=========================
+git merge vs git rebase
+=========================
+
+merge : it will merge changes from one branch to another branch and it will preserve commit history.
+
+rebase : it wil merge changes from one branch to another branch and it will not preserve commit history.
+
 ```
 # Delete Branch
 ```
@@ -167,3 +194,4 @@ node_modules/
 *.log
 .env
 ```
+

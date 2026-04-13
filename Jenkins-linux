@@ -1,0 +1,133 @@
+    
+    3  sudo yum update –y
+    4  sudo wget -O /etc/yum.repos.d/jenkins.repo     https://pkg.jenkins.io/rpm-stable/jenkins.repo
+    
+    5  sudo rpm --import https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
+    
+    6  sudo yum upgrade
+    
+    7  sudo yum install java-21-amazon-corretto -y
+    
+    8   sudo yum install jenkins -y
+    
+    9  sudo systemctl enable jenkins
+   
+   10  sudo systemctl start jenkins
+   
+   11   sudo systemctl status jenkins
+   
+   12  sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+   
+   13  sudo yum install git maven -y
+   
+   14  mvn --version
+   15  git --version
+   16  which git
+   
+   17  ls
+   18  which jenkins
+   19  ls /usr/bin/jenkins
+   20  ls -l /usr/bin/jenkins
+   21  sudo vi /usr/bin/jenkins
+   22  cd /var/lib/jenkins/
+   23  ls
+   24  vi config.xml
+   25  cd
+   26  ls /etc/
+   27  ls /etc/sysconfig/cd
+   28  sudo systemctl edit jenkins
+   29  sudo systemctl restart jenkins
+   30  sudo vi /etc/sysconfig/jenkins
+   31  sudo vi /usr/lib/systemd/system/jenkins.service
+   32  sudo systemctl restart jenkins
+   33  sudo systemctl edit jenkins
+   34  sudo systemctl restart jenkins
+   35  sudo systemctl edit jenkins
+   36  cd /var/lib/jenkins/
+   37  ls
+   38  cd workspace/
+   39  ls
+   40  cd A13-FJ/
+   41  LS
+   42  ls
+   43  cd /opt/
+   44  sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.117/bin/apache-tomcat-9.0.117.tar.gz
+   45  ls
+   46  sudo tar -xvf apache-tomcat-9.0.117.tar.gz
+   47  ls
+   48  sudo mv apache-tomcat-9.0.117 tomcat
+   49  ls
+   50  sudo rm -rf apache-tomcat-9.0.117.tar.gz
+   51  ls
+   52  ls -l
+   53  sudo chown -R ec2-user:ec2-user tomcat/
+   54  ls
+   55  cd tomcat/
+   56  ls -l
+   57  pwd
+   58  cd conf/
+   59  ls
+   60  vi server.xml
+   61  vi tomcat-users.xml
+   62  cd ..
+   63  ls
+   64  cd bin/
+   65  ls
+   66  ls -l
+   67  sudo chmod +x shutdown.sh
+   68  sudo chmod +x startup.sh
+   69  ls -l | gresp .sh
+   70  ls -l | grep .sh
+   71  ./shutdown.sh
+   72  ./startup.sh
+   
+   75  find / -name context.xml
+   
+vi /opt/tomcat/webapps/host-manager/META-INF/context.xml
+   
+   <!--  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+  allow="127.0.0.0/8,::1/128" /> -->
+   
+vi /opt/tomcat/webapps/manager/META-INF/context.xml
+    <!--  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+  allow="127.0.0.0/8,::1/128" /> -->
+   
+   78  ./shutdown.sh
+   79  ./startup.sh
+   80  ls
+   81  cd ..
+   82  ls
+   83  cd webapps/
+   84  ls
+   85  pwd
+   86  cd ..
+   87  ls -ld webapps/
+   88  cd ..
+   89  sudo chmod -R o+x tomcat/
+   90  ls -l tomcat/
+   91  ls -ld /opt/tomcat/
+   92  cd tomcat/
+   93  ls -ld webapps/
+   94  cd ..
+   95  sudo chmod -R o+wrx /opt/tomcat/
+   96  ls -ld webapps/
+   97  ls
+   98  ls -l
+   99  cd tomcat/
+  100  ls -ld
+  101  ls -l
+  102  cd
+  103  history
+  
+sudo ln -s /opt/tomcat/bin/startup.sh /usr/local/bin/tomcatup
+sudo ln -s /opt/tomcat/bin/shutdown.sh /usr/local/bin/tomcatdown
+
+
+sg
+
+ssh         # for linux machine
+rdp         # for windows machine
+allicmpipv4 # to check the connectivity  responce
+http        # port 80 by default webaccess
+https       # port 443 by default webaccess with secure (certificate)
+custom tcp  # provice required port as required

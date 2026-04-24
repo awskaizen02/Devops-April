@@ -1,0 +1,15 @@
+FROM  maven:amazoncorretto AS builder
+
+WORKDIR /app
+
+COPY A10-maven .
+
+RUN mvn install
+
+FROM tomcat:9.0
+
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ms.war
+
+EXPOSE 8080
+
+CMD ["catalina.sh", "run"]

@@ -1,0 +1,245 @@
+docker - contianer run and create image
+
+k8s    -  orchestration platform
+
+k8s -> Advantage
+
+self healing -> if any containers got damaged then it will replace with new container. we can achieve HA
+Free of cost : No need to purchase
+Scalibility -> Increases and decreases containers based on demand (AS)
+orchestration -> manage our application containers
+
+what is POD
+-------------->
+pod is a smallest building block in k8s cluster
+
+Applications will be deployed as PODs in K8s
+
+## to create PODS we will use docker images 
+To create PODs we will use Manifest YML file
+for single docker image we can create multiple pods also, in single pod cannot have same containers
+if we run application with multiple pods then we will get high HA and LB
+PODS count can be increased and decreased based on the demand
+
+
+k8s manifest yaml
+-----------------
+apiVersion:
+kind:
+metadata:
+spec:
+
+
+pod.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: javapod
+  labels:
+    app: javapod
+spec:
+  containers:
+    - name: demojava
+      image: dockerpandian/httpd:latest
+      ports:
+        - contianerPort: 80
+    
+kubectl apply -f pod.yaml   // execute manifest yml
+
+kubectl get pods   // check the pods
+
+kubect logs <podname>  // to get the logs of pod
+
+By default PODS can be accessible only with in the cluster. we cant access PODs outside the cluster directley
+
+to access Pods outside the cluster we need to expose them using k8s services concept.
+
+# https://kubernetes.io/docs/concepts/services-networking/service/
+-k8s services
+K8S service is used to expose the pods for outside access.
+
+Cluster IP
+NodePort
+LoadBalancer
+
+what is ClusterIp
+pod is a short lived object
+when pod is damaged/crashed k8s will replaced that with new POD
+for every pod new ip will be assigned
+
+## it is not at all recommended to use POD ip to access it
+Cluster Ip service is used to group all the pods and assign one static ip to access the pods
+
+## using ClusterIp we can access pods only with in the cluster
+
+## Database pods we dont expose for outside access.
+
+
+what is NodePort service
+-----------------------
+nodePort service is used to expode the pods to access outside of the cluster
+
+using Nodeport we can access the pods which are running in particular workernode
+
+what is load balancer
+---------------------
+LB service is used to distribute the load at worker node level
+
+service.yaml
+
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: javasvc
+spec:
+  type: NodePort
+  selector:
+  app: javapod
+ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30070
+
+kubectl apply -f service.yaml
+    
+kubectl get svc
+```
+When we use service type as NodePort then k8s will use one random port number to expose out application on worker node.
+
+NodePort Range : 30,000 to 32767
+if we can also fix nodeport number in service manifest yaml
+
+```
+
+------------------------
+pod and service in single manifest yaml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: javawebapppod
+  labels:
+    app: javawebapppod
+spec:
+  containers:
+    - name: demojava
+      image: dockerpandian/httpd:latest
+      ports:
+        - contianerPort: 80
+
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: javasvc
+spec:
+  type: NodePort
+  selector:
+  app: javawebapp
+ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30070        
+
+------------------------
+
+K8S NameSpaces
+
+Namespaces are used to group the resources logically
+
+    databse-pods  -> databse-ns
+    
+    backend-pods  -> backend-ns
+    
+    frontend-pods -> frontend-ns
+    
+inside K8s cluster we can create multiple NameSpace
+
+each namespace is isolated with another namespace
+
+kubectl get ns  // display k8s namespaces
+
+kubectl get pods -n kube-system // get pods of specific namespace
+
+## in kubectl command if we dont specify any namespace then it consider "default" namesapce
+
+in k8s we can create namespace in 2 ways
+    * using "kubectl creaet ns" command
+    * using manifest yaml file
+    
+kubectl create ns kaizenns
+
+kubeclt delete ns kaizenns
+
+when we delete a namespace all the resources belongs to that namespace also gets deleted
+
+-----
+ns.yaml
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kaizenns
+  
+kubectl apply -f   ns.yaml
+
+kubectl get all -n kaizenns
+----------------------------------------------------------------
+create a manifes with pod + service + namesapce
+
+2.yaml
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kaizenns
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: javawebapppod
+  namespace: kaizenns
+  labels:
+    app: javawebapppod
+spec:
+  containers:
+    - name: demojava
+      image: dockerpandian/httpd:latest
+      ports:
+        - contianerPort: 80
+
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: javasvc
+  namespace: kaizenns
+spec:
+  type: NodePort
+  selector:
+  app: javawebapp
+ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30070   
+    
+kubectl apply -f 2.yaml
+
+kubectl get pods -n kaizenns // check all ponds in kaizenns
+
+kubectl get svc -n kaizenns  // check service in kaizenns
+
+kubectl get all -n kaizenns  // check all resources
+
+---------------------------------------------------------------
+when we create POD direclty using "Kind: pod" in manifest yaml then k8s will not manage pod life cycle
+
+if we delete pod then k8s will not create new pod
+
+if we want k8s to manage pod life cycle then we should use k8s resources to create the pods

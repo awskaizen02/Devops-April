@@ -1,0 +1,64 @@
+install docekr on ubuntu
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh ./get-docker.sh 
+
+# https://hub.docker.com/ // to create user to send you images to docker hub
+
+ sudo usermod -aG docker $USER
+ 
+ sudo -i
+ su - ubuntu
+ 
+docker --version
+docker info
+docker images // to list the images
+docker pull httpd  // to get the images from docker hub to host machine
+
+ docker run -d --name web1 -P httpd  // to run a container
+ 
+-d // runs in background
+-it // login to container 
+--name // provide custamize name
+-P 32768->80/tcp // port number will get by default
+-p 8080:80 // we provide the port number
+  8080 host port number (machine we install docker)
+  80   container port number
+--rm // once the container stop, container will remove 
+docker run -itd --name web2 -P httpd
+
+docker exec -it f3000abdc32e /bin/bash
+
+
+docker commit -m "updated image" -a "kaizen" f3000abdc32e dockerpandian/httpd:a29
+  
+docker login -u dockerpandian
+  
+docker push dockerpandian/httpd:a29
+
+docker inspect web2 // container_name
+docker inspect dockerpandian/httpd:a29 // image_name
+
+docker history dockerpandian/httpd:a29
+
+docker logs web2
+
+docker stop $(docker ps -a -q)
+docker ps
+docker ps -a
+docker start
+docker start $(docker ps -a -q)
+docker kill $(docker ps -a -q)
+docker ps -a
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -a -q)
+docker images
+
+sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+
+sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+docker tag af9fe9631daf dockerpandian/c8:1
+
+
+  

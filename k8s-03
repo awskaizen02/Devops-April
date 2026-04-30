@@ -1,0 +1,212 @@
+1) ReplicationController (RC)
+2) ReplicaSet (RS)
+3) Deployment
+4) DaemonSet
+5) StatefulSet
+
+what is replicationController
+
+it is one of the resource in k8s to manage pod life cycle
+
+# if any pod is deleted/crashed/damaged then RC will perform self healing.
+
+using RC we can perfom PODs count scalu-up and scale-down
+
+rc.yaml
+
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: webrc
+spec:
+  replicas: 3
+  selector:
+    app: httpd
+  template:
+    metadata:
+      name: httpd
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: dockerpandian/httpd:latest
+        ports:
+        - containerPort: 80
+        
+
+kubectl apply -f rc.yaml
+
+kubectl get all
+
+kubectl get pods
+
+kubectl scale rc webrc --replicas=5
+
+kubectl scale rc webrc --replicas=1
+
+---
+Replicaset
+------------
+rs.yaml
+
+---
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: webrs
+  labels:
+    app: samplewebrs
+    tier: webrs
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: webrs
+  template:
+    metadata:
+      labels:
+        tier: webrs
+    spec:
+      containers:
+      - name: webrs
+        image: dockerpandian/httpd:latest
+        ports:
+          - contianers: 80
+
+kubectl apply -f rs.yaml          
+
+kubectl get pods
+
+kubectl delete pod <pod_name>
+
+kubectl scale rs webrs --replicas=5
+
+kubectl scale rs webrs --replicas=1
+
+---
+
+Deployment
+----------
+this is most recommended approach to deploy our applications in k8s cluster
+with deployment approach we have below advantages
+    Zero downtime
+    AutoScaling
+    Rolling update & rollback
+
+in Deployemnt we have 2 statergies to creat PODs
+    RollingUpdate
+    Recreate
+    
+Rollback:
+--------
+Sometimes, you may want to rollback a Deployment; for example, when the Deployment is not stable, such as crash looping. By default, all of the Deployment's rollout history is kept in the system so that you can rollback anytime you want (you can change that by modifying revision history limit).    
+
+dy.yaml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    app: httpd
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: dockerpandian/httpd:latest
+        ports:
+        - containerPort: 80
+
+        
+configMap & Secrets
+-----------------
+for every application have multiple environments will be available
+
+Dev
+SIT
+UAT
+PROD
+
+every env will have its own config properties to run the application
+
+database properties
+
+kafa server properties
+
+redis server properties
+
+payment gateways
+
+third party urls
+
+if we configure above properties with in the application then our application will become tightly coupled
+
+when we want to deploy our application in multiple environments then we need to make sure out application is loosely coupled with environment properties
+
+## to make our app loosely coupled with environment properties we can use configMap & Secrets
+
+## using configMap and Secrets we can de-couple application code and application properties so that out docker images will become loosely coupled
+
+# at the time of deployment, we can supply environment properties to the application container using configMap & Secrets
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-dev
+data:
+  db_url: "jdbc:mysql://localhost:3306"
+  db_name: "dockerpandian/sql"
+  db_port: "3306"
+  
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: Secret-dev
+type: Opaque
+  db_username: cm9vdA==
+  db_password: UEBzc3cwcmQ=
+  
+  
+kubectl apply -f <name_file.yaml>
+
+kubectl get secret
+
+
+---
+
+Blue - Green Deployment
+
+Blue green deployment is an application release model
+
+it reduces risk and minimizes downtime
+
+it uses two production environments, known as Blue and Green
+
+the old version can be called blue environment
+the new version can be know as the green environment
+
+-----------
+Advantages
+-----------
+
+Rapid releasing
+simple rollbacks
+built-in disaster recovery
+zero downtime

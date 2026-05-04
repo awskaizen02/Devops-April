@@ -1,0 +1,50 @@
+# do below steps in all machines
+
+sudo adduser ansible
+sudo vi /etc/ssh/sshd_config.d/60-cloudimg-settings.conf .
+sudo service ssh restart
+sudo visudo
+ansible ALL=(ALL:ALL) NOPASSWD: ALL
+
+su - ansible
+
+
+```
+sudo useradd ansible
+sudo passwd ansible
+sudo visudo
+ansible ALL=(ALL) NOPASSWD: ALL
+
+sudo vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+
+sudo service sshd restart
+
+
+# https://docs.ansible.com/projects/ansible/latest/installation_guide/installation_distros.
+# only in ansible controller
+```
+$ sudo apt update
+$ sudo apt install software-properties-common
+$ sudo add-apt-repository --yes --update ppa:ansible/ansible
+$ sudo apt install ansible
+
+ssh-keygen
+
+ssh-copy-id ansible@ip_address
+
+mkdir ansible
+
+vi ansible.cfg
+```
+[defaults]
+# some basic default values...
+inventory = /home/ansible/ansible/hosts
+```
+
+vi hosts
+```
+[group]
+pribate_ip of host machines
+```
+```

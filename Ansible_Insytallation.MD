@@ -1,3 +1,6 @@
+![Ansible](ansible.jpg)
+
+
 # do below steps in all machines
 
 sudo adduser ansible

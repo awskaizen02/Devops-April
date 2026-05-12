@@ -253,15 +253,48 @@ Allow the following inbound ports:
 | Grafana | 3000 | TCP |
 
 ---
+## Node exporter Installation
+## https://grafana.com/grafana/dashboards/1860-node-exporter-full/
 
-# 🎯 Summary
+cd /opt/
+sudo wget https://github.com/prometheus/node_exporter/releases/download/v1.11.1/node_exporter-1.11.1.linux-amd64.tar.gz
 
-- Installed Prometheus manually using tar package
-- Configured Prometheus as a systemd service
-- Installed Grafana Enterprise RPM
-- Enabled and started both services
-- Accessed:
-  - Prometheus → `9090`
-  - Grafana → `3000`
+sudo tar -xvf node_exporter-1.11.1.linux-amd64.tar.gz
+
+sudo mv node_exporter-1.11.1.linux-amd64/node_exporter /usr/local/bin/
+
+sudo useradd --no-create-home --shell /bin/false node_exporter
+
+sudo vim /etc/systemd/system/node_exporter.service
+
+```
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+```
+
+sudo systemctl daemon-reload
+sudo systemctl enable node_exporter
+sudo systemctl start node_exporter
+sudo systemctl status node_exporter
 
 ---
+## Add required Node's Name and Ip in prometheus.yml end of the file
+  - /etc/prometheus/prometheus.yml
+
+  - job_name: "Webserver"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["172.31.46.214:9100"]

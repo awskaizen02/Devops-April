@@ -290,7 +290,7 @@ sudo systemctl status node_exporter
 ---
 ## Add required Node's Name and Ip in prometheus.yml end of the file
   - /etc/prometheus/prometheus.yml
-
+```
   - job_name: "Webserver"
 
     # metrics_path defaults to '/metrics'
@@ -298,3 +298,4 @@ sudo systemctl status node_exporter
 
     static_configs:
       - targets: ["172.31.46.214:9100"]
+```

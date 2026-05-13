@@ -752,3 +752,54 @@ curl localhost
 
 ---
 
+---
+
+## Security & Performance
+
+### Q7: What is a "Reverse Proxy" and why is it critical for DevOps security?
+**Answer:**
+A Reverse Proxy (like Nginx) sits in front of backend servers.
+**Security Benefits:**
+1.  **Hide Backend Info:** Clients only see the proxy's IP, masking the actual app server topology.
+2.  **WAF Integration:** You can integrate ModSecurity or a cloud WAF before traffic hits your app.
+3.  **DDoS Mitigation:** The proxy can rate-limit requests (e.g., `limit_req_zone` in Nginx) to prevent overwhelming the backend.
+4.  **SSL Offloading:** Handles heavy encryption/decryption, freeing up CPU on the application servers.
+
+### Q8: How do you implement HTTP/3 support in your webserver stack in 2026?
+**Answer:**
+HTTP/3 runs over QUIC (UDP).
+1.  **Nginx Support:** As of recent versions (and definitely 2026), Nginx supports QUIC.
+2.  **Configuration:** You must enable the `http3` directive and open UDP port 443 in your firewall/Security Group (not just TCP).
+3.  **CDN:** Often, in 2026, you offload HTTP/3 to a CDN (like Cloudflare) which handles the QUIC negotiation and proxies standard HTTP/1.1 or HTTP/2 back to your origin Nginx server, simplifying the origin configuration.
+
+---
+
+## Scenario-Based Troubleshooting
+
+### Scenario 1: The 502 Bad Gateway
+**Scenario:** You have deployed a webserver (Nginx) reverse-proxying to a Node.js application. Users are reporting intermittent "502 Bad Gateway" errors. The Nginx logs show `connect() failed (111: Connection refused) while connecting to upstream`. How do you troubleshoot?
+
+**Answer:**
+1.  **Check Upstream Status:** Verify if the Node.js app is actually running (`systemctl status nodeapp` or `kubectl get pods`).
+2.  **Port Mismatch:** Check if the Node.js app is listening on the port Nginx expects (e.g., Nginx points to `localhost:3000`, but App listens on `0.0.0.0:3000` or vice versa).
+3.  **Firewall/Security Groups:** Ensure the firewall isn't dropping packets between the Nginx container/pod and the App container/pod.
+4.  **Resource Limits:** Check if the Upstream server is crashing due to OOM (Out of Memory) and restarting, causing Nginx to lose connection briefly.
+5.  **Timeouts:** If the app is slow, increase `proxy_read_timeout` in Nginx configuration to prevent Nginx from giving up too soon.
+
+### Scenario 2: Zero Downtime Deployment
+**Scenario:** You need to update the Nginx configuration on a production server handling 10k requests per second without dropping a single connection. How do you do it?
+
+**Answer:**
+1.  **Test Config:** Always run `nginx -t` to ensure the new config is valid.
+2.  **Graceful Reload:** Use `nginx -s reload` (or send a HUP signal).
+    *   *How it works:* Nginx spawns new master/worker processes with the new config. Old workers finish serving their *current* open connections before shutting down. No connections are killed.
+3.  **Blue/Green Deployment (Containerized):** If using Kubernetes/Docker, spin up a new set of pods with the new config. Update the Service selector to point to the new pods. The old pods remain until they finish connections (via `terminationGracePeriodSeconds`).
+
+### Scenario 3: Stale Content Caching
+**Scenario:** You updated the index.html file on the server, but users are still seeing the old version. You are using Nginx caching.
+
+**Answer:**
+1.  **Browser Cache:** Users might be caching locally. Fix this by adding Cache-Control headers in Nginx (`add_header Cache-Control "no-cache";`).
+2.  **Nginx Proxy Cache:** If you are caching responses from an upstream, you need to purge the cache.
+    *   *Quick fix:* Delete the files in the `/var/cache/nginx` directory.
+    *   *Pro fix:* Implement **Cache Busting** (versioning filenames like `style.v2.css`) or use the `proxy_cache_bypass` directive (`proxy_cache_bypass $http_cache_control`) to allow a refresh request to pass through to the backend.

@@ -1,3 +1,4 @@
+![Monitoring](prometheus.png)
 # Monitoring in DevOps
 
 ## 📌 What is Monitoring?

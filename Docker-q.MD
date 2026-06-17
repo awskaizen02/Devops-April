@@ -179,7 +179,7 @@ Example:
 FROM ubuntu:22.04
 RUN apt update
 CMD ["echo","Hello Docker"]
-
+```
 ---
 
 # Docker Interview Questions and Answers (Basic to Advanced with Scenario-Based Questions)
